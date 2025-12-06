@@ -19,42 +19,31 @@
         .user-avatar:hover { background-color: #2d3748; }
         .user-avatar.selected { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); background-color: #2d3748; border-bottom: 4px solid; }
         
-        /* Etichetta Utente nel Calendario */
-        .user-chip {
-            font-size: 0.70rem; 
-            padding: 2px 5px; 
-            border-radius: 4px; 
-            margin-bottom: 2px; 
-            color: #000; 
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-        }
-
-        /* Etichetta Campagna */
-        .campaign-label { 
-            font-size: 0.7rem; 
-            background: #ecc94b; 
-            color: #000; 
-            padding: 2px 4px; 
-            border-radius: 4px; 
-            margin-top: auto; 
-            font-weight: bold;
-            text-align: center;
-            border: 1px solid #d69e2e;
-        }
+        /* Etichette */
+        .user-chip { font-size: 0.70rem; padding: 2px 5px; border-radius: 4px; margin-bottom: 2px; color: #000; font-weight: bold; display: flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; box-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+        .campaign-label { font-size: 0.7rem; background: #ecc94b; color: #000; padding: 2px 4px; border-radius: 4px; margin-top: auto; font-weight: bold; text-align: center; border: 1px solid #d69e2e; }
         
-        /* Scrollbar nascosta per la lista utenti */
+        /* Scrollbar nascosta */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Modale */
-        .modal { display: none; position: fixed; z-index: 50; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); backdrop-filter: blur(2px); }
-        .modal-content { background-color: #2d3748; margin: 5% auto; padding: 24px; border-radius: 12px; width: 95%; max-width: 450px; max-height: 90vh; overflow-y: auto; border: 1px solid #4a5568; }
+        /* Modale - CORRETTO PER NON APRIRSI DA SOLO */
+        .modal { 
+            display: none; /* Fondamentale: nascosto di default */
+            position: fixed; 
+            z-index: 50; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.85); 
+            backdrop-filter: blur(2px);
+            /* Centratura flex nativa nel CSS per evitare conflitti */
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content { background-color: #2d3748; padding: 24px; border-radius: 12px; width: 95%; max-width: 450px; max-height: 90vh; overflow-y: auto; border: 1px solid #4a5568; position: relative; }
         
         /* Griglia Emoji */
         .emoji-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
@@ -65,13 +54,13 @@
 </head>
 <body class="p-2 md:p-4 max-w-6xl mx-auto flex flex-col h-screen">
 
-    <!-- Top Bar: Utenti e Titolo compatti -->
+    <!-- Top Bar -->
     <div class="flex flex-col md:flex-row items-center justify-between mb-4 gap-4">
         <div class="flex items-center gap-3">
             <h1 class="text-2xl font-bold text-yellow-500 tracking-tight"><i class="fa-solid fa-dice-d20"></i> BOARDGAME</h1>
         </div>
         
-        <!-- Lista Utenti Scorrevole -->
+        <!-- Lista Utenti -->
         <div class="flex-1 w-full overflow-x-auto no-scrollbar mx-2">
             <div id="users-container" class="flex gap-2 items-center px-2 py-1">
                 <!-- Utenti caricati qui -->
@@ -99,9 +88,9 @@
         <!-- I giorni verranno generati qui -->
     </div>
 
-    <!-- Modal Day Details -->
-    <div id="dayModal" class="modal flex items-center justify-center">
-        <div class="modal-content relative shadow-2xl">
+    <!-- 1. Modal Day Details (Nascosto di default con stile inline per sicurezza) -->
+    <div id="dayModal" class="modal" style="display: none;">
+        <div class="modal-content shadow-2xl">
             <span onclick="closeModal('dayModal')" class="absolute top-3 right-4 text-2xl cursor-pointer text-gray-400 hover:text-white">&times;</span>
             <h3 id="modalDateTitle" class="text-xl font-bold mb-6 text-center text-yellow-500">Dettagli Giorno</h3>
             
@@ -135,9 +124,9 @@
         </div>
     </div>
 
-    <!-- Modal User (Create / Edit) -->
-    <div id="userModal" class="modal flex items-center justify-center">
-        <div class="modal-content relative shadow-2xl">
+    <!-- 2. Modal User (Nascosto di default con stile inline per sicurezza) -->
+    <div id="userModal" class="modal" style="display: none;">
+        <div class="modal-content shadow-2xl">
             <span onclick="closeModal('userModal')" class="absolute top-3 right-4 text-2xl cursor-pointer text-gray-400 hover:text-white">&times;</span>
             <h3 id="userModalTitle" class="text-xl font-bold mb-4 text-blue-400">Profilo Giocatore</h3>
             
@@ -149,13 +138,13 @@
                 <!-- Emoticons generate via JS -->
             </div>
 
-            <input type="hidden" id="editingUserId" value=""> <!-- Hidden field to store ID if editing -->
+            <input type="hidden" id="editingUserId" value="">
 
             <button id="saveUserBtn" onclick="saveUser()" class="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-lg font-bold text-white shadow-lg transition">
                 SALVA
             </button>
             
-            <!-- Pulsante Elimina (solo se in modifica) -->
+            <!-- Pulsante Elimina -->
             <div id="deleteUserContainer" class="mt-4 text-center hidden">
                 <button onclick="deleteUser()" class="text-red-400 text-xs hover:text-red-300 underline">Elimina questo profilo</button>
             </div>
@@ -194,7 +183,6 @@
         let selectedEmoji = '🎲'; 
         let selectedColor = '#63b3ed';
 
-        // Assets
         const emojis = [
             '🧙‍♂️','🧝‍♀️','🧛','🧟','🐉','🐺','🦄','👽','🤖','🤠','🕵️‍♂️','👨‍🚀',
             '⚔️','🛡️','🏹','🧪','🔮','🗡️','🎩','👑','💀','🤡','👻','👹',
@@ -212,7 +200,6 @@
         const usersRef = ref(db, 'users');
         onValue(usersRef, (snapshot) => {
             users = snapshot.val() || {};
-            // Controllo se l'utente salvato esiste ancora
             if (currentUserId && !users[currentUserId]) {
                 currentUserId = null;
                 localStorage.removeItem('boardgame_selected_user');
@@ -226,7 +213,6 @@
             const container = document.getElementById('users-container');
             container.innerHTML = '';
             
-            // Ordina utenti: prima il selezionato, poi gli altri alfabetico
             const sortedIds = Object.keys(users).sort((a,b) => {
                 if (a === currentUserId) return -1;
                 if (b === currentUserId) return 1;
@@ -240,17 +226,13 @@
                 const div = document.createElement('div');
                 div.className = `user-avatar flex flex-col items-center cursor-pointer p-2 rounded-lg relative ${isSelected ? 'selected' : 'opacity-70 hover:opacity-100'}`;
                 
-                // Se selezionato, usa il suo colore per il bordo inferiore
                 if(isSelected) div.style.borderColor = user.color;
 
-                // Logica Click: 
-                // - Se clicco un altro: lo seleziono.
-                // - Se clicco ME STESSO (già selezionato): apro modifica.
                 div.onclick = () => {
                     if (isSelected) {
-                        openUserModal(id); // Modifica
+                        openUserModal(id); 
                     } else {
-                        selectUser(id); // Seleziona
+                        selectUser(id); 
                     }
                 };
 
@@ -319,11 +301,9 @@
                     }
                 }
                 
-                // Stile giorno corrente
                 const todayKey = new Date().toISOString().split('T')[0];
                 const isToday = dateKey === todayKey;
                 const todayBorder = isToday ? "border-blue-500 shadow-[0_0_10px_rgba(66,153,225,0.3)]" : "border-gray-600";
-                
                 let campaignBorder = note ? "border-yellow-500" : todayBorder;
 
                 grid.innerHTML += `
@@ -340,7 +320,8 @@
             }
         };
 
-        // --- LOGICA MODALE GIORNO ---
+        // --- GESTIONE MODALI ---
+        
         window.openDayModal = function(dateKey, day) {
             selectedDayKey = dateKey;
             const d = new Date(dateKey);
@@ -352,7 +333,6 @@
             const loginWarn = document.getElementById('loginWarning');
             const availSec = document.getElementById('availabilitySection');
 
-            // Se utente loggato, mostra controlli
             if(currentUserId && users[currentUserId]) {
                 loginWarn.classList.add('hidden');
                 availSec.classList.remove('hidden');
@@ -362,20 +342,17 @@
                 availSec.classList.add('hidden');
                 updateModalUserList(); 
             }
-            
             const dayData = availabilityData[dateKey] || {};
             document.getElementById('campaignInput').value = dayData.note || '';
         };
 
         window.updateModalState = function() {
             if(!selectedDayKey) return;
-            
             if (currentUserId && users[currentUserId]) {
                 const dayData = availabilityData[selectedDayKey] || {};
                 const userAvails = dayData.users || {};
                 const isAvailable = userAvails[currentUserId] === true;
                 const btn = document.getElementById('toggleBtn');
-                
                 if(isAvailable) {
                     btn.innerText = "PRESENTE! 🤩";
                     btn.className = "w-full py-4 rounded-xl font-bold text-xl transition bg-green-600 border-green-500 text-white shadow-[0_0_15px_rgba(72,187,120,0.5)] border-b-4 border-green-800 active:border-b-0 active:translate-y-1";
@@ -392,16 +369,12 @@
             listContainer.innerHTML = '';
             const dayData = availabilityData[selectedDayKey] || {};
             const userAvails = dayData.users || {};
-            
             let count = 0;
             for(const [uid, status] of Object.entries(userAvails)) {
                 if(status && users[uid]) {
                     const u = users[uid];
                     count++;
-                    listContainer.innerHTML += `
-                        <div class="user-chip text-sm px-3 py-1.5" style="background-color: ${u.color};">
-                            ${u.emoji} ${u.name}
-                        </div>`;
+                    listContainer.innerHTML += `<div class="user-chip text-sm px-3 py-1.5" style="background-color: ${u.color};">${u.emoji} ${u.name}</div>`;
                 }
             }
             if(count === 0) listContainer.innerHTML = '<span class="text-gray-500 italic text-sm">Nessuna adesione per ora.</span>';
@@ -418,12 +391,11 @@
         window.saveCampaignNote = function() {
             if(!selectedDayKey) return;
             const text = document.getElementById('campaignInput').value;
-            const noteRef = ref(db, `calendar/${selectedDayKey}/note`);
-            set(noteRef, text);
+            set(ref(db, `calendar/${selectedDayKey}/note`), text);
             closeModal('dayModal');
         };
 
-        // --- LOGICA CREAZIONE / MODIFICA UTENTE ---
+        // --- GESTIONE UTENTE (CREAZIONE/MODIFICA) ---
         
         window.openUserModal = function(editId = null) {
             document.getElementById('userModal').style.display = 'flex';
@@ -434,28 +406,23 @@
             const btn = document.getElementById('saveUserBtn');
 
             if (editId && users[editId]) {
-                // MODALITÀ MODIFICA
                 const u = users[editId];
                 nameInput.value = u.name;
                 selectedEmoji = u.emoji;
                 selectedColor = u.color;
                 hiddenId.value = editId;
-                
                 title.innerText = "Modifica Profilo";
                 btn.innerText = "SALVA MODIFICHE";
                 deleteContainer.classList.remove('hidden');
             } else {
-                // MODALITÀ NUOVO
                 nameInput.value = '';
                 selectedEmoji = '🎲';
-                selectedColor = getAutoColor(); // Assegna colore casuale
+                selectedColor = getAutoColor(); 
                 hiddenId.value = '';
-                
                 title.innerText = "Nuovo Giocatore";
                 btn.innerText = "CREA";
                 deleteContainer.classList.add('hidden');
             }
-            
             renderEmojiGrid();
         };
 
@@ -466,10 +433,7 @@
                 const span = document.createElement('div');
                 span.className = `emoji-opt ${e === selectedEmoji ? 'selected' : ''}`;
                 span.innerText = e;
-                span.onclick = () => {
-                    selectedEmoji = e;
-                    renderEmojiGrid();
-                };
+                span.onclick = () => { selectedEmoji = e; renderEmojiGrid(); };
                 container.appendChild(span);
             });
         }
@@ -477,45 +441,28 @@
         function getAutoColor() {
             const usedColors = Object.values(users).map(u => u.color);
             const available = colors.filter(c => !usedColors.includes(c));
-            return available.length > 0 
-                ? available[Math.floor(Math.random() * available.length)] 
-                : colors[Math.floor(Math.random() * colors.length)];
+            return available.length > 0 ? available[Math.floor(Math.random() * available.length)] : colors[Math.floor(Math.random() * colors.length)];
         }
 
         window.saveUser = function() {
             const name = document.getElementById('userNameInput').value;
             const editId = document.getElementById('editingUserId').value;
-            
             if(!name.trim()) return alert("Inserisci un nome!");
 
             if (editId) {
-                // UPDATE
-                const userRef = ref(db, `users/${editId}`);
-                update(userRef, {
-                    name: name,
-                    emoji: selectedEmoji,
-                    // Manteniamo il colore vecchio se stiamo editando, o vuoi cambiarlo? 
-                    // Per ora manteniamolo stabile.
-                    color: selectedColor 
-                });
-                closeModal('userModal');
+                update(ref(db, `users/${editId}`), { name: name, emoji: selectedEmoji, color: selectedColor });
             } else {
-                // CREATE NEW
                 const newUserRef = push(ref(db, 'users'));
-                set(newUserRef, {
-                    name: name,
-                    emoji: selectedEmoji,
-                    color: selectedColor
-                });
-                selectUser(newUserRef.key); // Auto select
-                closeModal('userModal');
+                set(newUserRef, { name: name, emoji: selectedEmoji, color: selectedColor });
+                selectUser(newUserRef.key);
             }
+            closeModal('userModal');
         };
 
         window.deleteUser = function() {
             const editId = document.getElementById('editingUserId').value;
             if(!editId) return;
-            if(confirm("Sei sicuro di voler eliminare questo profilo?")) {
+            if(confirm("Eliminare profilo?")) {
                 remove(ref(db, `users/${editId}`));
                 if (currentUserId === editId) {
                     currentUserId = null;
